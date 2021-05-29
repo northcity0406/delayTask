@@ -42,6 +42,6 @@ func ZRangeValue(key string, start, stop int64) ([]string, error) {
 }
 
 func ZRemValueByMembers(key string, members []interface{}) error {
-	zRem := db.RedisClient.ZRem(key, members)
+	zRem := db.RedisClient.ZRem(key, members...)
 	return zRem.Err()
 }

@@ -1,6 +1,10 @@
 package TaskModel
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"github.com/vmihailenco/msgpack"
+	"time"
+)
 
 type TaskModel struct {
 	RegisterTime  int64
@@ -21,4 +25,20 @@ func NewTaskModel(registerTime int64, executionTime int64, args map[string]inter
 		Args:          data,
 		TaskType:      taskType,
 	}
+}
+
+func (t *TaskModel) MarshalBinary() ([]byte, error) {
+	return msgpack.Marshal(t)
+}
+
+func (t *TaskModel) UnmarshalBinary(data []byte) error {
+	return msgpack.Unmarshal(data, t)
+}
+
+func (t *TaskModel) CanExecute() bool {
+	registerTime := time.Unix(t.ExecutionTime, 0)
+	if registerTime.After(time.Now()) {
+		return false
+	}
+	return true
 }

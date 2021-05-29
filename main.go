@@ -13,13 +13,12 @@ import (
 const task = "tasks"
 
 func Ping(data []byte) error {
-	fmt.Println(string(data))
 	fmt.Println("pong")
 	return nil
 }
 
 func ECHO(data []byte) error {
-	fmt.Println(string(data))
+	fmt.Println("echo")
 	return nil
 }
 
@@ -29,12 +28,16 @@ func LoopTasks() {
 		for _, val := range taskList {
 			taskModel := TaskModel.TaskModel{}
 			err := json.Unmarshal([]byte(val), &taskModel)
+			if !taskModel.CanExecute() {
+				continue
+			}
 			if err == nil {
 				err := tasks.DealTask(taskModel.TaskType, taskModel.Args)
 				if err == nil {
 					var rem []interface{}
-					rem = append(rem, val)
-					_ = DBHandler.ZRemValueByMembers(task, rem)
+					rem = append(rem, &taskModel)
+					err = DBHandler.ZRemValueByMembers(task, rem)
+					fmt.Println(err)
 				}
 			}
 		}
@@ -59,5 +62,7 @@ func main() {
 			data, _ := json.Marshal(taskModel)
 			_ = DBHandler.ZAddValue(task, data, float64(execTime))
 		}
+	}
+	for {
 	}
 }
