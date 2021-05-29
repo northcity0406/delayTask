@@ -51,16 +51,11 @@ func main() {
 
 	for i := 0; i < 1000; i++ {
 		args := make(map[string]interface{})
-		now := time.Now().Unix()
 		execTime := time.Now().Add(5 * time.Second).Unix()
 		if rand.Int()%3 == 0 {
-			taskModel := TaskModel.NewTaskModel(now, execTime, args, tasks.Ping)
-			data, _ := json.Marshal(taskModel)
-			_ = DBHandler.ZAddValue(task, data, float64(execTime))
+			TaskModel.AddTask(execTime, args, tasks.Ping)
 		} else {
-			taskModel := TaskModel.NewTaskModel(now, execTime, args, tasks.ECHO)
-			data, _ := json.Marshal(taskModel)
-			_ = DBHandler.ZAddValue(task, data, float64(execTime))
+			TaskModel.AddTask(execTime, args, tasks.ECHO)
 		}
 	}
 	for {
